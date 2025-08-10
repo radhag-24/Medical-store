@@ -1,0 +1,95 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+body,
+html {
+  height: 100%;
+  background: linear-gradient(135deg, #6dd5fa, #2980b9);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 40px 60px;
+  max-width: 450px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.hero h1 {
+  font-size: 2.8rem;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.hero p {
+  font-size: 1.25rem;
+  font-weight: 300;
+  margin-bottom: 40px;
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+}
+
+.scroll-down {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.btn {
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  color: #2980b9;
+  background: #fff;
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.4);
+  user-select: none;
+}
+
+.btn:hover,
+.btn:focus {
+  background-color: #1f7ac9;
+  color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(31, 122, 201, 0.7);
+  outline: none;
+}
+
+.btn-purchase {
+  letter-spacing: 1px;
+}
+
+.btn-purchase:hover {
+  background-color: #1f7ac9;
+  color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(31, 122, 201, 0.7);
+}
+
+.btn-purchase.green-hover:hover {
+  background-color: #8fbc8f;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(143, 188, 143, 0.7);
+  transform: scale(1.05);
+}
+
+.btn-purchase.red-hover:hover {
+  background-color: #f08080;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(240, 128, 128, 0.7);
+  transform: scale(1.05);
+}

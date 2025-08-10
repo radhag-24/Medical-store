@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Select Products | Health Care Store</title>
+    <link rel="stylesheet" href="/static/items.css" />
+  </head>
+  <body>
+    <h1>Select Products</h1>
+
+    <form method="POST" action="/items/add">
+      <select name="product_name" required>
+        <option value="" disabled selected>Select a product</option>
+        <option value="dolo">dolo (₹10)</option>
+        <option value="paracetamol">paracetamol (₹15)</option>
+        <option value="ibuprofen">ibuprofen (₹12)</option>
+      </select>
+      <input
+        type="number"
+        name="quantity"
+        min="1"
+        value="1"
+        style="width: 60px; margin-left: 8px"
+        required
+      />
+      <button type="submit">Add</button>
+    </form>
+
+    {% if selected_items %}
+    <h2>Selected Items</h2>
+    <form method="POST" action="/items/remove">
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price (₹)</th>
+            <th>Amount (₹)</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in selected_items %}
+          <tr>
+            <td>{{ item.product_name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.price }}</td>
+            <td>{{ item.amount }}</td>
+            <td>
+              <button
+                class="remove-btn"
+                type="submit"
+                name="remove_product"
+                value="{{ item.product_name }}"
+              >
+                Remove
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+
+    <form method="POST" action="/items/submit">
+      <button class="submit-btn" type="submit">Submit Purchase</button>
+    </form>
+    {% endif %}
+  </body>
+</html>

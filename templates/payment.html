@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Payment Summary</title>
+    <link rel="stylesheet" href="/static/payment.css" />
+  </head>
+  <body>
+    <h2>Bill Summary</h2>
+    <table id="summaryTable">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price (₹)</th>
+          <th>Amount (₹)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" style="text-align: right"><strong>Total</strong></td>
+          <td id="totalAmount">0</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <label for="paymentMode">Mode of Payment:</label>
+    <select id="paymentMode">
+      <option value="">-- Select Payment Mode --</option>
+      <option value="cash">Cash</option>
+      <option value="card">Card</option>
+      <option value="upi">UPI</option>
+    </select>
+
+    <button id="submitBtn" disabled>Submit</button>
+
+    <script>
+      function getCart() {
+        const cart = localStorage.getItem("cart");
+        return cart ? JSON.parse(cart) : [];
+      }
+
+      function renderSummary() {
+        const cart = getCart();
+        const tbody = document.querySelector("#summaryTable tbody");
+        tbody.innerHTML = "";
+        let total = 0;
+
+        cart.forEach((item) => {
+          const amount = item.price * item.quantity;
+          total += amount;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+        <td>${item.product_name}</td>
+        <td>${item.quantity}</td>
+        <td>${item.price.toFixed(2)}</td>
+        <td>${amount.toFixed(2)}</td>
+      `;
+          tbody.appendChild(tr);
+        });
+
+        document.getElementById("totalAmount").textContent = total.toFixed(2);
+      }
+
+      document.getElementById("paymentMode").addEventListener("change", (e) => {
+        document.getElementById("submitBtn").disabled = e.target.value === "";
+      });
+
+      document
+        .getElementById("submitBtn")
+        .addEventListener("click", async () => {
+          const paymentMode = document.getElementById("paymentMode").value;
+          if (!paymentMode) {
+            alert("Select payment mode");
+            return;
+          }
+
+          const cart = getCart();
+          if (cart.length === 0) {
+            alert("Cart is empty");
+            return;
+          }
+
+          const invoice_no = "inv" + Date.now();
+
+          const payload = {
+            invoice_no: invoice_no,
+            mode_of_payment: paymentMode,
+            items: cart,
+          };
+
+          try {
+            const res = await fetch("/api/submit_order", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const result = await res.json();
+            if (res.ok) {
+              alert("Order placed successfully! Invoice No: " + invoice_no);
+              localStorage.removeItem("cart");
+              window.location.href = "index.html";
+            } else {
+              alert("Error: " + (result.error || "Failed to place order"));
+            }
+          } catch (e) {
+            alert("Failed to submit order");
+          }
+        });
+
+      renderSummary();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,25 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  max-width: 600px;
+  margin: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+label {
+  display: block;
+  margin-top: 10px;
+}
+select,
+button {
+  margin-top: 5px;
+  padding: 5px 10px;
+}

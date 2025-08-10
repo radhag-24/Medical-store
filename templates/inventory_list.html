@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Inventory List</title>
+    <link rel="stylesheet" href="/static/inventory_list.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Inventory List</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Sl. No</th>
+            <th>Product Type</th>
+            <th>Product Name</th>
+            <th>Stock</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in inventory %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ item.product_type }}</td>
+            <td>{{ item.product_name }}</td>
+            <td>{{ item.stock }}</td>
+            <td class="status-{{ item.status | replace(' ', '-')}}">
+              {{ item.status }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="bottom-buttons">
+        <a href="/" class="btn back-btn">Back to Home</a>
+        <a href="/inventory/update" class="btn add-stock-btn">ADD STOCK</a>
+      </div>
+    </div>
+  </body>
+</html>

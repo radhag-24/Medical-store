@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Items</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Healthcare Store</h1>
+        </header>
+        
+        <main>
+            <section class="item-selection">
+                <h2>Select Items</h2>
+                
+                <form method="GET" action="/purchase/" class="type-selection">
+                    <div class="form-group">
+                        <label for="item-type">Item Type</label>
+                        <select name="type_nr" id="item-type" onchange="this.form.submit()" required>
+                            <option value="">-- Select Item Type --</option>
+                            {% for type in types %}
+                            <option value="{{ type.nr }}" {% if type.nr|string == selected_type|string %}selected{% endif %}>
+                                {{ type.type }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+                
+                {% if selected_type %}
+                <form action="/purchase/invoice-items/add" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="product">Product</label>
+                        <select name="product_id" id="product" required onchange="updateProductDetails(this)">
+                            <option value="">-- Select Product --</option>
+                            {% for product in products %}
+                            <option value="{{ product.nr }}" 
+                                    data-name="{{ product.name }}"
+                                    data-price="{{ product.price }}"
+                                    data-type="{{ product.type_nr }}">
+                                {{ product.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" name="quantity" id="quantity" min="1" max="1" required>
+                        <small class="hint-text">Available: <span id="available-quantity">0</span></small>
+                    </div>
+                    
+                    <input type="hidden" name="product_name" id="product-name">
+                    <input type="hidden" name="price" id="product-price">
+                    <input type="hidden" name="type_nr" id="product-type">
+                    
+                    <button type="submit" class="btn">Add to Cart</button>
+                </form>
+                {% else %}
+                <div class="select-prompt">
+                    <p>Please select an item type to view available products</p>
+                </div>
+                {% endif %}
+            </section>
+
+            <section class="cart-items">
+                <h2>Your Cart</h2>
+                {% if cart %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Amount</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart %}
+                        <tr>
+                            <td>{{ item.product_id }}</td>
+                            <td>{{ item.product_name }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>₹{{ item.price }}</td>
+                            <td>₹{{ item.amount }}</td>
+                            <td>
+                                <form action="/purchase/invoice-items/remove/{{ item.product_id }}" method="POST">
+                                    <button type="submit" class="btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="empty-cart">Your cart is empty</p>
+                {% endif %}
+            </section>
+            
+            {% if cart %}
+            <div class="checkout">
+                <a href="/billing" class="btn">Buy Now</a>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+
+    <script>
+    function updateProductDetails(select) {
+        const selectedOption = select.options[select.selectedIndex];
+        if (selectedOption.value) {
+            document.getElementById('product-name').value = selectedOption.dataset.name;
+            document.getElementById('product-price').value = selectedOption.dataset.price;
+            document.getElementById('product-type').value = selectedOption.dataset.type;
+            
+            const typeNr = selectedOption.dataset.type;
+            const productNr = selectedOption.value;
+            fetch(`/purchase/product-stock/${typeNr}/${productNr}`)
+                .then(response => response.json())
+                .then(data => {
+                    const available = data.quantity || 0;
+                    document.getElementById('available-quantity').textContent = available;
+                    document.getElementById('quantity').max = available;
+                    document.getElementById('quantity').value = 1;
+                });
+        }
+    }
+    </script>
+    <script>
+  window.history.replaceState(null, '', window.location.href);
+</script>
+</body>
+</html>

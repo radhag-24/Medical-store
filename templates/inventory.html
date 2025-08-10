@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inventory Stock Update</title>
+    <link rel="stylesheet" href="/static/inventory.css">
+</head>
+<body>
+  <div class="container">
+
+    <form method="GET" action="/inventory/update" id="typeForm">
+      <label for="product_type">Product Type</label>
+      <select name="type_nr" id="product_type" required onchange="this.form.submit()">
+        <option value="">-- Select Product Type --</option>
+        {% for type in types %}
+          <option value="{{ type.nr }}" {% if type.nr|string == selected_type|string %}selected{% endif %}>
+            {{ type.type }}
+          </option>
+        {% endfor %}
+      </select>
+    </form>
+
+    <form method="POST" action="/inventory/update-stock" id="stockForm">
+      <label for="product">Product</label>
+      <select name="product_nr" id="product" required {% if not selected_type %}disabled{% endif %}>
+        <option value="">-- Select Product --</option>
+        {% if selected_type %}
+          {% for product in products %}
+            <option value="{{ product.nr }}">{{ product.name }}</option>
+          {% endfor %}
+        {% endif %}
+      </select>
+
+      <label for="quantity">Quantity</label>
+      <input type="number" name="quantity" id="quantity" min="0" required />
+
+      <label for="status">Status</label>
+      <select name="stock_status" id="status" required>
+        <option value="">-- Select Status --</option>
+        <option value="in-stock">In Stock</option>
+        <option value="out-of-stock">Out of Stock</option>
+      </select>
+
+      <input type="hidden" name="type_nr" value="{{ selected_type }}">
+
+      <button type="submit" class="update">Update Stock</button>
+    </form>
+
+    <a href="/" class="btn back-btn">Back to Home</a>
+
+    {% if message %}
+      <div class="message {% if success %}success{% else %}error{% endif %}">
+        {{ message }}
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>

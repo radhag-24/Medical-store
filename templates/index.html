@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Product Store</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Product Store</h1>
+
+      Product Selection
+      <div class="form-block">
+        <label for="type">Product Type</label>
+        <select id="type"></select>
+      </div>
+
+      <div class="form-block">
+        <label for="product">Product</label>
+        <select id="product"></select>
+      </div>
+
+      <div class="form-block">
+        <label for="quantity">Quantity</label>
+        <input type="number" id="quantity" min="1" value="1" />
+      </div>
+
+      <button id="add-to-cart">Add to Cart</button>
+
+      Cart
+      <h2>Cart</h2>
+      <table id="cart-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Qty</th>
+            <th>Amount</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="form-block">
+        <label for="payment">Mode of Payment</label>
+        <select id="payment">
+          <option value="cash">Cash</option>
+          <option value="card">Card</option>
+          <option value="upi">UPI</option>
+        </select>
+      </div>
+
+      <button id="generate-invoice" class="buy-btn">Generate Invoice</button>
+    </div>
+
+    <script>
+      async function fetchTypes() {
+        const res = await fetch("/api/types");
+        const data = await res.json();
+        const typeSelect = document.getElementById("type");
+        typeSelect.innerHTML = "";
+        data.forEach((t) => {
+          const opt = document.createElement("option");
+          opt.value = t.nr;
+          opt.textContent = t.type;
+          typeSelect.appendChild(opt);
+        });
+        fetchProducts(typeSelect.value);
+      }
+
+      async function fetchProducts(typeId) {
+        const res = await fetch(`/api/products/${typeId}`);
+        const data = await res.json();
+        const productSelect = document.getElementById("product");
+        productSelect.innerHTML = "";
+        data.forEach((p) => {
+          const opt = document.createElement("option");
+          opt.value = p.nr;
+          opt.textContent = p.name;
+          productSelect.appendChild(opt);
+        });
+      }
+
+      async function updateCart() {
+        const res = await fetch("/api/invoice-items");
+        const cart = await res.json();
+        const tbody = document.querySelector("#cart-table tbody");
+        tbody.innerHTML = "";
+        cart.forEach((item) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                <td>${item.product_name}</td>
+                <td>${item.price}</td>
+                <td>${item.quantity}</td>
+                <td>${item.amount}</td>
+                <td><button onclick="removeFromCart(${item.product_id})" class="remove-btn">Remove</button></td>
+            `;
+          tbody.appendChild(row);
+        });
+      }
+
+      async function addToCart() {
+        const productId = document.getElementById("product").value;
+        const productName =
+          document.getElementById("product").selectedOptions[0].text;
+        const quantity = parseInt(
+          document.getElementById("quantity").value,
+          10
+        );
+
+        const price = 100;
+
+        await fetch("/api/invoice-items/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product_id: parseInt(productId),
+            product_name: productName,
+            price,
+            quantity,
+          }),
+        });
+        updateCart();
+      }
+
+      async function removeFromCart(id) {
+        await fetch(`/api/invoice-items/remove/${id}`, { method: "DELETE" });
+        updateCart();
+      }
+
+      async function generateInvoice() {
+        const payment = document.getElementById("payment").value;
+        const res = await fetch("/api/invoice/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode_of_payment: payment }),
+        });
+        const result = await res.json();
+        alert(
+          `Invoice Generated: ${result.invoice_no}\nTotal: ${result.total_amount}`
+        );
+        updateCart();
+      }
+
+      document
+        .getElementById("type")
+        .addEventListener("change", (e) => fetchProducts(e.target.value));
+      document
+        .getElementById("add-to-cart")
+        .addEventListener("click", addToCart);
+      document
+        .getElementById("generate-invoice")
+        .addEventListener("click", generateInvoice);
+
+      fetchTypes();
+      updateCart();
+    </script>
+  </body>
+</html>
