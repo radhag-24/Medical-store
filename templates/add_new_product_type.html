@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add New Product Type</title>
+  <link rel="stylesheet" href="/static/inventory.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Add New Product and Type</h2>
+    
+    {% if message %}
+      <div class="message-container">
+        {% if success %}
+          <div class="message success-message">
+            <div class="success-icon">✓</div>
+            <div class="success-text">{{ message }}</div>
+          </div>
+        {% else %}
+          <div class="message error-message">
+            <div class="error-icon">⚠️</div>
+            <div class="error-text">
+              {% if "Duplicate entry" in message %}
+                {% if "hc_product_type.type" in message %}
+                  This product type already exists. Please choose a different type name.
+                {% else %}
+                  This product type already exists. Please choose a different name.
+                {% endif %}
+              {% else %}
+                An error occurred. Please try again.
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+    
+    <form method="POST" action="/inventory/add-new-product-type" id="newProductTypeForm">
+      <label for="new_type_name">New Product Type Name</label>
+      <input type="text" name="new_type_name" id="new_type_name" required>
+
+      <label for="product_name">Product Name</label>
+      <input type="text" name="product_name" id="product_name" required>
+
+      <label for="price">Price</label>
+      <input type="number" name="price" id="price" step="0.01" min="0" required>
+
+      <label for="quantity">Initial Quantity</label>
+      <input type="number" name="quantity" id="quantity" min="0" required>
+
+      <button type="submit" class="update">Add New Product and Type</button>
+    </form>
+
+    <div class="center-button">
+      <a href="/inventory/add-product" class="btn back-btn">Back to Options</a>
+    </div>
+  </div>
+</body>
+</html>

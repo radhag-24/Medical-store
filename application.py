@@ -1,12 +1,13 @@
 
-from flask import Flask, render_template, request  
-from controllers import bp as purchase_bp
+from flask import Flask, render_template, request, jsonify  
+from controllers import purchase_bp, inventory_bp
 import models
 
 
 app = Flask(__name__)
 
 app.register_blueprint(purchase_bp, url_prefix="/purchase")
+app.register_blueprint(inventory_bp, url_prefix="/inventory")
 
 
 @app.route("/")
@@ -32,61 +33,20 @@ def payment_summary():
 def inventory_list():
     inventory = models.get_inventory_list()
     return render_template("inventory_list.html", inventory=inventory)
-
-@app.route("/inventory/update", methods=["GET"])
-def inventory_update_form():
-    from models import get_types, get_products
+@app.route("/inventory/add-product")
+def add_product_page():
+    from models import get_types
     types = get_types()
-    selected_type = request.args.get('type_nr')
-    products = []
-    
-    if selected_type:
-        products = get_products(int(selected_type))
-    
-    return render_template("inventory.html", 
-                         types=types, 
-                         products=products,
-                         selected_type=selected_type)
+    return render_template("add_product.html", types=types)
 
-@app.route("/inventory/update-stock", methods=["POST"])
-def update_stock():
-    from models import update_stock, get_types, get_products
-
-    type_nr = request.form.get("type_nr")
-    product_nr = request.form.get("product_nr")
-    quantity = request.form.get("quantity")
-    stock_status = request.form.get("stock_status")
-
-    if None in (type_nr, product_nr, quantity, stock_status) or "" in (type_nr, product_nr, quantity, stock_status):
-        types = get_types()
-        products = get_products(int(type_nr)) if type_nr else []
-        return render_template("inventory.html", 
-                               types=types,
-                               products=products,
-                               selected_type=type_nr,
-                               message="Please fill all fields",
-                               success=False)
-
-    result = update_stock(int(type_nr), int(product_nr), int(quantity), None)  
-
-
+@app.route("/inventory/add-existing-product-form")
+def add_existing_product_form():
+    from models import get_types
     types = get_types()
-    products = get_products(int(type_nr))
+    return render_template("add_existing_product.html", types=types)
 
-    if result["success"]:
-        message = "Stock updated successfully"
-        success = True
-    else:
-        message = result["error"]
-        success = False
-
-    return render_template("inventory.html", 
-                           types=types,
-                           products=products,
-                           selected_type=type_nr,
-                           message=message,
-                           success=success)
-
-
+@app.route("/inventory/add-new-product-type-form")
+def add_new_product_type_form():
+    return render_template("add_new_product_type.html")
 if __name__ == "__main__":
     app.run(debug=True)

@@ -101,3 +101,86 @@ a.add-stock-btn {
 a.add-stock-btn:hover {
   background-color: #0069d9;
 }
+.bottom-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+a.btn {
+    flex: 1;
+    text-align: center;
+}
+
+a.add-product-btn {
+    background-color: #4a90e2;
+}
+a.add-product-btn:hover {
+    background-color: #3a7bc8;
+}
+
+.bottom-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+a.btn {
+    flex: 1;
+    text-align: center;
+}
+
+a.add-product-btn {
+    background-color: #4a90e2;
+}
+a.add-product-btn:hover {
+    background-color: #3a7bc8;
+}
+
+.center-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+a.add-product-btn {
+  background-color: #28a745;
+}
+a.add-product-btn:hover {
+  background-color: #218838;
+}
+
+.bottom-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px; 
+}
+
+.bottom-buttons a.btn {
+  flex: 1; 
+  text-align: center;
+  padding: 10px; 
+}
+
+a.back-btn {
+  background-color: #6c757d;
+}
+a.back-btn:hover {
+  background-color: #5a6268;
+}
+
+a.add-stock-btn {
+  background-color: #007bff;
+}
+a.add-stock-btn:hover {
+  background-color: #0069d9;
+}
+
+a.add-product-btn {
+  background-color: #28a745;
+}
+a.add-product-btn:hover {
+  background-color: #218838;
+}

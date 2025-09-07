@@ -1,4 +1,3 @@
-
 import mysql.connector
 import json
 from datetime import datetime
@@ -7,6 +6,8 @@ with open("config.json") as f:
     db_config = json.load(f)
 
 cart = []
+
+
 
 def get_connection():
     return mysql.connector.connect(**db_config)
@@ -157,6 +158,14 @@ def generate_invoice(data):
         new_num = 1 if last_invoice_num is None else last_invoice_num + 1
         invoice_no = f"INV-{str(new_num).zfill(3)}"
 
+        cursor.execute("""
+            SELECT MAX(CAST(SUBSTRING(shipping_no, 5) AS UNSIGNED)) 
+            FROM hc_invoice_item_history 
+            WHERE shipping_no LIKE 'SHI-%'
+        """)
+        last_shipping_num = cursor.fetchone()[0]
+        new_shipping_num = 1 if last_shipping_num is None else last_shipping_num + 1
+
         total_amount = sum(item["amount"] for item in cart)
 
         cursor.execute("""
@@ -166,12 +175,16 @@ def generate_invoice(data):
         payment_nr = cursor.lastrowid
 
         for item in cart:
+            shipping_no = f"SHI-{str(new_shipping_num).zfill(3)}"
+            new_shipping_num += 1 
             cursor.execute("""
-                INSERT INTO hc_invoice_item_history (payment_nr, inv_no, product_id, product_name, amount, quantity, total_amount, create_date)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
+                INSERT INTO hc_invoice_item_history 
+                (payment_nr, inv_no, shipping_no, product_id, product_name, amount, quantity, total_amount, create_date)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
             """, (
                 payment_nr,
                 invoice_no,
+                shipping_no,
                 item["product_id"],
                 item["product_name"],
                 item["price"],
@@ -203,3 +216,122 @@ def generate_invoice(data):
     finally:
         cart.clear()
         conn.close()
+
+def get_purchase_history():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    query = """
+    SELECT 
+        h.create_date AS date,
+        pt.type AS product_type,
+        h.product_name,
+        h.quantity,
+        h.total_amount,
+        ph.mode_of_payment,
+        h.shipping_no,
+        h.shipping_status,
+        h.nr AS row_id
+    FROM hc_invoice_item_history h
+    LEFT JOIN hc_inventory inv ON h.product_id = inv.product_nr
+    LEFT JOIN hc_product_type pt ON inv.type_nr = pt.nr
+    LEFT JOIN hc_payment_history ph ON h.inv_no = ph.invoice_no
+    ORDER BY h.nr DESC
+    """
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+def delete_purchase_item(row_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM hc_invoice_item_history WHERE nr = %s", (row_id,))
+    conn.commit()
+    conn.close()
+
+
+
+def add_product_existing_type(type_nr, product_name, price, quantity):
+    conn = None
+    cursor = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+       
+        cursor.execute("SELECT nr FROM hc_product_type WHERE nr = %s", (type_nr,))
+        if not cursor.fetchone():
+            return {"success": False, "error": "Product type does not exist"}
+        
+    
+        cursor.execute("""
+            INSERT INTO hc_product_master (name, price, type_nr)
+            VALUES (%s, %s, %s)
+        """, (product_name, price, type_nr))
+        product_nr = cursor.lastrowid
+        
+     
+        stock_status = 'in-stock' if quantity > 0 else 'out-of-stock'
+        cursor.execute("""
+            INSERT INTO hc_inventory (type_nr, product_nr, available_stock, stock_status)
+            VALUES (%s, %s, %s, %s)
+        """, (type_nr, product_nr, quantity, stock_status))
+        
+        conn.commit()
+        return {"success": True, "product_id": product_nr}
+        
+    except mysql.connector.Error as err:
+        if conn and conn.in_transaction:
+            conn.rollback()
+        return {"success": False, "error": f"Database error: {err}"}
+    finally:
+        if cursor:
+            cursor.close()
+        if conn and conn.is_connected():
+            conn.close()
+
+
+def add_new_product_with_type(new_type_name, product_name, price, quantity):
+    conn = None
+    cursor = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+       
+        conn.start_transaction()
+        
+        cursor.execute("""
+            INSERT INTO hc_product_type (type)
+            VALUES (%s)
+        """, (new_type_name,))
+        type_nr = cursor.lastrowid
+        
+        cursor.execute("""
+            INSERT INTO hc_product_master (name, price, type_nr)
+            VALUES (%s, %s, %s)
+        """, (product_name, price, type_nr))
+        product_nr = cursor.lastrowid
+        
+        stock_status = 'in-stock' if quantity > 0 else 'out-of-stock'
+        cursor.execute("""
+            INSERT INTO hc_inventory (type_nr, product_nr, available_stock, stock_status)
+            VALUES (%s, %s, %s, %s)
+        """, (type_nr, product_nr, quantity, stock_status))
+        
+        conn.commit()
+        return {
+            "success": True,
+            "type_id": type_nr,
+            "product_id": product_nr
+        }
+        
+    except mysql.connector.Error as err:
+        if conn and conn.in_transaction:
+            conn.rollback()
+        return {"success": False, "error": f"Database error: {err}"}
+    finally:
+        if cursor:
+            cursor.close()
+        if conn and conn.is_connected():
+            conn.close()

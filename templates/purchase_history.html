@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Purchase History</title>
+        <link rel="stylesheet" href="/static/purchase_history.css" />
+  </head>
+  <body>
+    <div class="header">
+      <h1 class="page-title">Purchase History</h1>
+      <button class="home-btn" onclick="window.location.href='/'">
+        <i class="fas fa-home"></i>
+      </button>
+    </div>
+    <br />
+
+    <!-- Font Awesome for icon -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Product Type</th>
+          <th>Product Name</th>
+          <th>Qty</th>
+          <th>Total Amount</th>
+          <th>Mode of Payment</th>
+          <th>Shipping No</th>
+          <th>Shipping Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td>{{ row.date }}</td>
+          <td>{{ row.product_type }}</td>
+          <td>{{ row.product_name }}</td>
+          <td>{{ row.quantity }}</td>
+          <td>{{ row.total_amount }}</td>
+          <td>{{ row.mode_of_payment }}</td>
+          <td>{{ row.shipping_no }}</td>
+          <td>{{ row.shipping_status }}</td>
+          <td>
+            <form
+              method="POST"
+              action="{{ url_for('purchase.delete_purchase', row_id=row.row_id) }}"
+              style="display: inline"
+            >
+              <button
+                type="submit"
+                class="delete-btn"
+                onclick="return confirm('Delete this record?')"
+              >
+                Delete
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>
