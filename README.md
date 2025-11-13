@@ -87,9 +87,6 @@ http://127.0.0.1:5000/
 - All CRUD operations for products, inventory, cart, and invoices are handled via Flask routes.  
 - Frontend pages use HTML, CSS, and JavaScript with DOM manipulation for dynamic cart and stock updates.
 
-## 📄 License
-
-This project is licensed under the MIT License – free to use and modify.
 
 ## 👨‍💻 Author
 Developed by [radhag-24](https://github.com/radhag-24) ✨
