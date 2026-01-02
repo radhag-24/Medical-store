@@ -89,7 +89,9 @@ http://127.0.0.1:5000/
 
 
 ## 👨‍💻 Author
-Developed by [radhag-24](https://github.com/radhag-24) ✨
+Developed by 
+[radhag-24](https://github.com/radhag-24) ✨
+Software Developer
 
  ✨
 
