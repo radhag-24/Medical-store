@@ -25,9 +25,11 @@ Built with **Flask (Python)**, **MySQL**, **HTML/CSS/JavaScript**.
 
 ## 📂 Project Structure
 
+```
+
 HEALTH_CARE/
 │
-├─ **static/**  
+├─ static/
 │   ├─ cart.css  
 │   ├─ home.css  
 │   ├─ inventory_list.css  
@@ -35,27 +37,27 @@ HEALTH_CARE/
 │   ├─ payment.css  
 │   └─ purchase_history.css  
 │
-├─ **templates/**  
-│   ├─ **Product Management:**  
+├─ templates/ 
+│   ├─ Product Management:
 │   │   ├─ add_product.html  
 │   │   ├─ add_existing_product.html  
 │   │   └─ add_new_product_type.html  
 │   │  
-│   ├─ **Inventory & Stock:**  
+│   ├─ Inventory & Stock: 
 │   │   ├─ inventory.html  
 │   │   └─ inventory_list.html  
 │   │  
-│   ├─ **Purchase & Billing:**  
+│   ├─ Purchase & Billing: 
 │   │   ├─ purchase.html  
 │   │   ├─ cart.html  
 │   │   ├─ billing.html  
 │   │   ├─ payment.html  
 │   │   └─ payment_summary.html  
 │   │  
-│   ├─ **Purchase History:**  
+│   ├─ Purchase History:
 │   │   └─ purchase_history.html  
 │   │  
-│   └─ **Home:**  
+│   └─ Home: 
 │       ├─ home.html  
 │       ├─ index.html  
 │       └─ items.html  
@@ -67,6 +69,7 @@ HEALTH_CARE/
 ├─ config.example.json     # Example config template  
 └─ .gitignore
 
+```
 
 ---
 
@@ -87,13 +90,6 @@ http://127.0.0.1:5000/
 - This is a mini project; no virtual environment or requirements file included.  
 - All CRUD operations for products, inventory, cart, and invoices are handled via Flask routes.  
 - Frontend pages use HTML, CSS, and JavaScript with DOM manipulation for dynamic cart and stock updates.
-
----
-
-## 👨‍💻 Author
-Developed by 
-[radhag-24](https://github.com/radhag-24) ✨
-Software Developer
 
 ---
 
@@ -157,4 +153,15 @@ CREATE TABLE IF NOT EXISTS hc_invoice_item_history (
     FOREIGN KEY (payment_nr) REFERENCES hc_payment_history(nr),
     FOREIGN KEY (product_id) REFERENCES hc_product_master(nr)
 );
+
+```
+
+## 👨‍💻 Author
+Developed by 
+[radhag-24](https://github.com/radhag-24) ✨
+Software Developer
+
+---
+
+
 
