@@ -81,19 +81,21 @@ python application.py
 ### 3. Open the app in browser
 http://127.0.0.1:5000/
 
+---
 
 ### 📝 Notes
 - This is a mini project; no virtual environment or requirements file included.  
 - All CRUD operations for products, inventory, cart, and invoices are handled via Flask routes.  
 - Frontend pages use HTML, CSS, and JavaScript with DOM manipulation for dynamic cart and stock updates.
 
+---
 
 ## 👨‍💻 Author
 Developed by 
 [radhag-24](https://github.com/radhag-24) ✨
 Software Developer
 
- ✨
+---
 
 ## 🗄️ Database Schema (MySQL)
 
